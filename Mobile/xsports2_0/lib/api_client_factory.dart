@@ -1,0 +1,7 @@
+import 'package:http/http.dart' as http;
+
+import 'api_client_stub.dart'
+    if (dart.library.html) 'api_client_web.dart'
+    as implementation;
+
+http.Client createApiClient() => implementation.createApiClient();

@@ -23,3 +23,7 @@ Thumbs.db
 
 # Configurações locais
 appsettings.Local.json
+
+# Arquivos de teste
+banco_conf.txt
+GerarSenha/
