@@ -16,3 +16,10 @@ appsettings.Development.json
 # Sistema operacional
 .DS_Store
 Thumbs.db
+
+# Arquivos de ambiente
+.env
+.env.*
+
+# Configurações locais
+appsettings.Local.json
