@@ -17,8 +17,8 @@ class ApiService {
   ApiService._();
 
   static const _baseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: 'http://localhost:5048',
+  'API_BASE_URL',
+  defaultValue: 'https://xsports.onrender.com',
   );
   static final http.Client _client = createApiClient();
   static String? _accessToken;
