@@ -1,0 +1,93 @@
+@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="pt-br" class="h-full">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Xsports</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                },
+            },
+        }
+    </script>
+    <script>
+        if (localStorage.getItem('tema') === 'escuro') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+</head>
+<body class="min-h-full bg-gray-50 dark:bg-gray-900 font-sans antialiased text-gray-800 dark:text-gray-100 m-0 flex flex-col justify-center 
+items-center p-4">
+
+    <div class="max-w-md w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm p-8 space-y-6 
+    my-auto">
+        
+        <!-- Cabeçalho -->
+        <div class="text-center space-y-2">
+            <div class="inline-flex p-3 bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 rounded-xl mb-1">
+                <i data-lucide="shield-check" class="w-8 h-8"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Xsports</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Entre com suas credenciais de administrador</p>
+        </div>
+
+        <!-- Mensagem de Erro -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="p-3 text-sm text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-center" role="alert">
+                E-mail ou senha inválidos.
+            </div>
+        }
+
+        <!-- Formulário -->
+        <form method="post" class="space-y-4">
+            <input type="hidden" asp-for="ReturnUrl" />
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">E-mail</label>
+                <input type="email" asp-for="Email" required autocomplete="username" placeholder="seu@email.com" class="w-full px-4 py-2.5 bg-white dark:bg-gray-700 
+                text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-600 
+                focus:outline-none" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Senha</label>
+                <input type="password" asp-for="Senha" required autocomplete="current-password" placeholder="••••••••" class="w-full px-4 py-2.5 bg-white dark:bg-gray-700 
+                text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-600 
+                focus:outline-none" />
+            </div>
+
+            <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg 
+            shadow-sm transition">
+                Entrar no Sistema
+            </button>
+        </form>
+
+        <div class="text-center text-xs text-gray-400 dark:text-gray-500">
+            PIM - Análise e Desenvolvimento de Sistemas
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

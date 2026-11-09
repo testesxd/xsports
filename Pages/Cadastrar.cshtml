@@ -1,0 +1,77 @@
+@page
+@model CadastrarModel
+@{
+    ViewData["Title"] = "Cadastrar Produto";
+}
+
+<div class="max-w-2xl mx-auto">
+    <!-- Cabeçalho com link de voltar para o Estoque -->
+    <div class="mb-6 flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Novo Produto</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Preencha os campos para adicionar um item ao catálogo.</p>
+        </div>
+        <a href="/Estoque" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">
+            Voltar ao estoque
+        </a>
+    </div>
+
+    <!-- Formulário de Cadastro -->
+    <form method="post" enctype="multipart/form-data" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
+    rounded-xl p-6 shadow-sm space-y-4 transition-colors duration-200">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome do Produto</label>
+            <input type="text" asp-for="NovoProduto.Nome" required placeholder="Ex: Tênis Running 5000" class="w-full px-4 py-2 border 
+            border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 
+            focus:ring-indigo-600 focus:outline-none" />
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Categoria</label>
+            <select asp-for="NovoProduto.Categoria" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
+            text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-600 focus:outline-none">
+                <option value="Masculino">Masculino</option>
+                <option value="Feminino">Feminino</option>
+                <option value="Infantil">Infantil</option>
+                <option value="Infantil">Unissex</option>
+            </select>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Preço (R$)</label>
+                <input type="number" step="0.01" asp-for="NovoProduto.Preco" required placeholder="0.00" class="w-full px-4 py-2 border 
+                border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 
+                focus:ring-indigo-600 focus:outline-none" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Quantidade em Estoque</label>
+                <input type="number" asp-for="NovoProduto.Estoque" required placeholder="10" class="w-full px-4 py-2 border border-gray-300 
+                dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 
+                focus:ring-indigo-600 focus:outline-none" />
+            </div>
+        </div>
+
+        <!-- Campo de Upload da Imagem -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Imagem do Produto</label>
+            <input type="file" asp-for="Foto" accept="image/*" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 
+            rounded-lg bg-gray-50 dark:bg-gray-700 text-sm text-gray-500 dark:text-gray-300 file:mr-4 file:py-1.5 file:px-3 file:rounded-md 
+            file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 dark:file:bg-indigo-900/50 file:text-indigo-700 
+            dark:file:text-indigo-300 hover:file:bg-indigo-100 transition cursor-pointer" />
+        </div>
+
+        <!-- Rodapé -->
+        <div class="pt-4 flex justify-end gap-3 border-t border-gray-100 dark:border-gray-700">
+            <a href="/Estoque" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 
+            rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                Cancelar
+            </a>
+            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition 
+            shadow-sm">
+                Salvar Produto
+            </button>
+        </div>
+    </form>
+</div>

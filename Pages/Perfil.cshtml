@@ -1,0 +1,126 @@
+@page
+@model PerfilModel
+@{
+    ViewData["Title"] = "Meu Perfil";
+}
+
+<div class="max-w-xl mx-auto space-y-6">
+    <!-- Cabeçalho da Página -->
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Meu Perfil</h1>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Gerencie suas informações pessoais e dados de acesso.</p>
+    </div>
+
+    <!-- Card de Configuração -->
+    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm p-6 space-y-6">
+        
+        <!-- Alerta de Sucesso -->
+        @if (TempData["MensagemSucesso"] is string mensagemSucesso)
+        {
+            <div class="p-3 text-sm text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg text-center" role="status">
+                @mensagemSucesso
+            </div>
+        }
+        <div asp-validation-summary="All" class="text-sm text-red-700 dark:text-red-300" role="alert"></div>
+
+        <form method="post" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome de Exibição</label>
+                <input type="text" asp-for="Nome" required maxlength="150" class="w-full px-4 py-2.5 bg-white dark:bg-gray-700 text-gray-900 
+                dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-600 
+                focus:outline-none" />
+                <p class="text-xs text-gray-400 mt-1">Este nome aparecerá no rodapé da barra lateral do sistema.</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">E-mail de Acesso</label>
+                <input type="email" value="@Model.Email" disabled class="w-full px-4 py-2.5 bg-gray-100 dark:bg-gray-700/50 
+                text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-lg text-sm cursor-not-allowed" />
+            </div>
+
+            <hr class="border-gray-200 dark:border-gray-700 my-4" />
+
+            <h3 class="text-md font-semibold text-gray-900 dark:text-white">Alterar Senha</h3>
+
+            <!-- Senha Atual -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Senha Atual</label>
+                <div class="relative">
+                    <input type="password" asp-for="SenhaAtual" autocomplete="current-password" class="w-full px-4 py-2.5 bg-white dark:bg-gray-700 
+                    text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-600 focus:outline-none pr-10" />
+                    <button type="button" class="toggle-password absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 
+                    hover:text-gray-600 dark:hover:text-gray-200" data-toggle="#SenhaAtual">
+                        <i data-lucide="eye" class="eye-icon w-5 h-5"></i>
+                        <i data-lucide="eye-off" class="eye-off-icon w-5 h-5 hidden"></i>
+                    </button>
+                </div>
+                <p class="text-xs text-gray-400 mt-1">Informe sua senha atual somente para alterá-la.</p>
+            </div>
+
+            <!-- Nova Senha -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nova Senha</label>
+                <div class="relative">
+                    <input type="password" asp-for="NovaSenha" autocomplete="new-password" placeholder="••••••••" class="w-full px-4 py-2.5 bg-white dark:bg-gray-700 
+                    text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 
+                    focus:ring-indigo-600 focus:outline-none pr-10" />
+                    <button type="button" class="toggle-password absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 
+                    hover:text-gray-600 dark:hover:text-gray-200" data-toggle="#NovaSenha">
+                        <i data-lucide="eye" class="eye-icon w-5 h-5"></i>
+                        <i data-lucide="eye-off" class="eye-off-icon w-5 h-5 hidden"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Confirmar Nova Senha -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirmar Nova Senha</label>
+                <div class="relative">
+                    <input type="password" asp-for="ConfirmarSenha" autocomplete="new-password" placeholder="••••••••" class="w-full px-4 py-2.5 bg-white dark:bg-gray-700 
+                    text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 
+                    focus:ring-indigo-600 focus:outline-none pr-10" />
+                    <button type="button" class="toggle-password absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 
+                    hover:text-gray-600 dark:hover:text-gray-200" data-toggle="#ConfirmarSenha">
+                        <i data-lucide="eye" class="eye-icon w-5 h-5"></i>
+                        <i data-lucide="eye-off" class="eye-off-icon w-5 h-5 hidden"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg 
+            shadow-sm transition">
+                Salvar Alterações
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        // Botão "olhinho"
+        const toggleButtons = document.querySelectorAll('.toggle-password');
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const inputSelector = this.getAttribute('data-toggle');
+                const input = document.querySelector(inputSelector);
+                const eyeIcon = this.querySelector('.eye-icon');
+                const eyeOffIcon = this.querySelector('.eye-off-icon');
+
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    eyeIcon.classList.add('hidden');
+                    eyeOffIcon.classList.remove('hidden');
+                } else {
+                    input.type = 'password';
+                    eyeOffIcon.classList.add('hidden');
+                    eyeIcon.classList.remove('hidden');
+                }
+            });
+        });
+
+    });
+</script>

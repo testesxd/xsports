@@ -1,0 +1,89 @@
+@page "{id:int}"
+@model Xsports.Pages.EditarModel
+@{
+    ViewData["Title"] = "Editar Produto";
+}
+
+<div class="max-w-2xl mx-auto">
+    <div class="mb-6 flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Editar Produto</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Atualize os dados do produto selecionado.</p>
+        </div>
+        <a href="/Index" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">
+            Voltar
+        </a>
+    </div>
+
+    <!-- Adicionadas classes dark: para o fundo e borda do formulário -->
+    <form method="post" enctype="multipart/form-data" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl 
+    p-6 shadow-sm space-y-4 transition-colors duration-200">
+        <!-- Campo Oculto ID do Produto -->
+        <input type="hidden" asp-for="Produto.Id" />
+        <input type="hidden" asp-for="Produto.ImagemUrl" />
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome do Produto</label>
+            <!-- Fundo escuro, texto branco e borda escura para o input -->
+            <input type="text" asp-for="Produto.Nome" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-gray-900 
+            dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-600 
+            focus:outline-none" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Categoria</label>
+                <select asp-for="Produto.Categoria" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
+                text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-600 focus:outline-none">
+                    <option value="Masculino">Masculino</option>
+                    <option value="Feminino">Feminino</option>
+                    <option value="Infantil">Infantil</option>
+                    <option value="Unissex">Unissex</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Preço (R$)</label>
+                <!-- Fundo escuro, texto branco e borda escura -->
+                <input type="number" step="0.01" asp-for="Produto.Preco" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 
+                text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-600
+                focus:outline-none" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Quantidade em Estoque</label>
+                <!-- Fundo escuro, texto branco e borda escura -->
+                <input type="number" asp-for="Produto.Estoque" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-gray-900 
+                dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-600 
+                focus:outline-none" />
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Foto Atual</label>
+            @if (!string.IsNullOrEmpty(Model.Produto.ImagemUrl))
+            {
+                <div class="mb-2">
+                    <img src="@Model.Produto.ImagemUrl" alt="Foto atual" class="w-20 h-20 object-cover rounded-lg border border-gray-200 
+                    dark:border-gray-700" />
+                </div>
+            }
+            <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Substituir Imagem (opcional)</label>
+            <!-- Modo escuro -->
+            <input type="file" asp-for="NovaFoto" accept="image/*" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 
+            rounded-lg bg-gray-50 dark:bg-gray-700 text-sm text-gray-500 dark:text-gray-300 file:mr-4 file:py-1.5 file:px-3 file:rounded-md 
+            file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 dark:file:bg-indigo-950 file:text-indigo-700 
+            dark:file:text-indigo-300 hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900 transition" />
+        </div>
+
+        <div class="pt-4 flex justify-end gap-3 border-t border-gray-100 dark:border-gray-700">
+            <!-- Botão Cancelar -->
+            <a href="/Index" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 rounded-lg 
+            hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                Cancelar
+            </a>
+            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
+                Salvar Alterações
+            </button>
+        </div>
+    </form>
+</div>

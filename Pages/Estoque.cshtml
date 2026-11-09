@@ -1,0 +1,164 @@
+@page
+@model Xsports.Pages.EstoqueModel
+@{
+    ViewData["Title"] = "Controle de Estoque";
+}
+
+<!-- Cabeçalho da Página -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Gerenciamento de Estoque</h1>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Acompanhe as quantidades e o status do inventário em tempo real.</p>
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <!-- Se houver busca ativa, exibe o botão Voltar/Limpar -->
+        @if (!string.IsNullOrEmpty(Model.TermoBusca))
+        {
+            <a href="/Estoque" class="inline-flex items-center justify-center gap-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 
+            dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-3.5 py-2.5 rounded-lg text-sm font-medium transition shrink-0">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                Voltar ao Estoque
+            </a>
+        }
+
+        <!-- Botão de Cadastrar Produto -->
+        <a href="/Cadastrar" class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 
+        py-2.5 rounded-lg font-medium text-sm transition shadow-sm shrink-0">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            Cadastrar Produto
+        </a>
+    </div>
+</div>
+
+<!-- Termo pesquisado -->
+@if (!string.IsNullOrEmpty(Model.TermoBusca))
+{
+    <div class="mb-4 p-3 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 rounded-lg flex items-center 
+    justify-between text-sm text-indigo-900 dark:text-indigo-200">
+        <span>Resultados para a pesquisa: <strong>"@Model.TermoBusca"</strong></span>
+        <a href="/Estoque" class="text-xs font-semibold underline hover:text-indigo-700 dark:hover:text-indigo-300">
+            Limpar filtro
+        </a>
+    </div>
+}
+
+<!-- Tabela de Produtos / Estoque -->
+<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden transition-colors 
+duration-200">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-gray-600 dark:text-gray-300">
+            <!-- Cabeçalho da Tabela -->
+            <thead class="bg-gray-50 dark:bg-gray-700/50 text-xs text-gray-700 dark:text-gray-300 uppercase border-b border-gray-200 
+            dark:border-gray-700">
+                <tr>
+                    <th scope="col" class="px-6 py-4">Produto</th>
+                    <th scope="col" class="px-6 py-4">Preço Un.</th>
+                    <th scope="col" class="px-6 py-4">Qtd. Estoque</th>
+                    <th scope="col" class="px-6 py-4">Status</th>
+                    <th scope="col" class="px-6 py-4 text-right">Ações</th>
+                </tr>
+            </thead>
+
+            <!-- Corpo da Tabela -->
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                @if (Model.Produtos != null && Model.Produtos.Any())
+                {
+                    @foreach (var produto in Model.Produtos)
+                    {
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition">
+                            
+                            <!-- Produto (Imagem + Nome) -->
+                            <td class="px-6 py-4 font-medium text-gray-900 dark:text-white flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 p-1 flex items-center justify-center 
+                                shrink-0 border border-gray-200 dark:border-gray-600">
+                                    <img src="@produto.ImagemUrl" alt="@produto.Nome" class="max-h-full max-w-full object-contain rounded" />
+                                </div>
+                                <span class="truncate max-w-xs" title="@produto.Nome">@produto.Nome</span>
+                            </td>
+
+                            <!-- Preço -->
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
+                                R$ @produto.Preco.ToString("N2")
+                            </td>
+
+                            <!-- Quantidade -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="font-semibold text-gray-900 dark:text-white">@produto.Estoque</span>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">unid.</span>
+                            </td>
+
+                            <!-- Status de Estoque -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if (produto.Estoque <= 5)
+                                {
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 
+                                    dark:bg-red-950/60 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-red-600 dark:bg-red-400"></span>
+                                        Estoque Crítico
+                                    </span>
+                                }
+                                else if (produto.Estoque <= 15)
+                                {
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 
+                                    dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-600 dark:bg-amber-400"></span>
+                                        Estoque Baixo
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold 
+                                    bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 
+                                    dark:border-emerald-800">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400"></span>
+                                        Em Dia
+                                    </span>
+                                }
+                            </td>
+
+                            <!-- Botões de Editar e Excluir -->
+                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                                <div class="flex items-center justify-end gap-3">
+                                    <a href="/Editar/@produto.Id" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 
+                                    dark:hover:text-indigo-300 font-medium text-xs hover:underline">
+                                        Editar
+                                    </a>
+
+                                    <form method="post" asp-page-handler="Deletar" asp-route-id="@produto.Id" onsubmit="return 
+                                    confirm('Tem certeza que deseja excluir o produto @produto.Nome?');">
+                                        <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 
+                                        font-medium text-xs hover:underline">
+                                            Excluir
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                            Nenhum produto encontrado.
+                            @if (!string.IsNullOrEmpty(Model.TermoBusca))
+                            {
+                                <div class="mt-2">
+                                    <a href="/Estoque" class="text-indigo-600 dark:text-indigo-400 font-medium hover:underline text-sm">
+                                        Clique aqui para limpar a busca e ver todos os produtos
+                                    </a>
+                                </div>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    lucide.createIcons();
+</script>

@@ -1,0 +1,18 @@
+# Arquivos gerados pelo .NET
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Logs
+*.log
+
+# Configurações locais e credenciais
+appsettings.Development.json
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
