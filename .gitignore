@@ -27,3 +27,6 @@ appsettings.Local.json
 # Arquivos de teste
 banco_conf.txt
 GerarSenha/
+
+#Banco de dados
+Banco/
