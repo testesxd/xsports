@@ -18,6 +18,7 @@
     <!-- Adicionadas classes dark: para o fundo e borda do formulário -->
     <form method="post" enctype="multipart/form-data" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl 
     p-6 shadow-sm space-y-4 transition-colors duration-200">
+        <div asp-validation-summary="All" class="text-sm text-red-600 dark:text-red-400"></div>
         <!-- Campo Oculto ID do Produto -->
         <input type="hidden" asp-for="Produto.Id" />
         <input type="hidden" asp-for="Produto.ImagemUrl" />
@@ -44,7 +45,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Preço (R$)</label>
                 <!-- Fundo escuro, texto branco e borda escura -->
-                <input type="number" step="0.01" asp-for="Produto.Preco" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 
+                <input type="number" min="0.01" step="0.01" asp-for="Produto.Preco" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 
                 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-600
                 focus:outline-none" />
             </div>
@@ -52,7 +53,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Quantidade em Estoque</label>
                 <!-- Fundo escuro, texto branco e borda escura -->
-                <input type="number" asp-for="Produto.Estoque" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-gray-900 
+                <input type="number" min="0" asp-for="Produto.Estoque" required class="w-full px-4 py-2 bg-white dark:bg-gray-700 text-gray-900 
                 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-600 
                 focus:outline-none" />
             </div>

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace Xsports.Pages
 {
@@ -8,7 +9,9 @@ namespace Xsports.Pages
     {
         public int Id { get; set; }
         public string Nome { get; set; } = string.Empty;
+        [Range(typeof(decimal), "0.01", "79228162514264337593543950335", ErrorMessage = "O preço deve ser maior que zero.")]
         public decimal Preco { get; set; }
+        [Range(0, int.MaxValue, ErrorMessage = "A quantidade em estoque não pode ser negativa.")]
         public int Estoque { get; set; }
         public string ImagemUrl { get; set; } = string.Empty;
 

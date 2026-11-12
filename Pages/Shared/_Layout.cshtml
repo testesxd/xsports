@@ -267,6 +267,53 @@
             }
         });
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll("form[data-submit-cooldown]").forEach(function (form) {
+                const button = form.querySelector('button[type="submit"], input[type="submit"]');
+                if (!button) return;
+
+                const cooldownSeconds = 5;
+                const storageKey = `submitCooldown:${form.dataset.submitCooldown}`;
+                const originalContent = button.innerHTML;
+                let countdownTimer;
+
+                function updateButton() {
+                    const expiresAt = Number(sessionStorage.getItem(storageKey) || 0);
+                    const remaining = Math.ceil((expiresAt - Date.now()) / 1000);
+
+                    if (remaining <= 0) {
+                        sessionStorage.removeItem(storageKey);
+                        button.disabled = false;
+                        button.innerHTML = originalContent;
+                        button.classList.remove("opacity-60", "cursor-not-allowed");
+                        if (countdownTimer) clearInterval(countdownTimer);
+                        return;
+                    }
+
+                    button.disabled = true;
+                    button.textContent = `Aguarde ${remaining}s`;
+                    button.classList.add("opacity-60", "cursor-not-allowed");
+                    if (!countdownTimer) countdownTimer = setInterval(updateButton, 250);
+                }
+
+                form.addEventListener("submit", function (event) {
+                    const expiresAt = Number(sessionStorage.getItem(storageKey) || 0);
+                    if (expiresAt > Date.now()) {
+                        event.preventDefault();
+                        updateButton();
+                        return;
+                    }
+
+                    sessionStorage.setItem(storageKey, String(Date.now() + cooldownSeconds * 1000));
+                    updateButton();
+                });
+
+                updateButton();
+            });
+        });
+    </script>
     
 </body>
 </html>
