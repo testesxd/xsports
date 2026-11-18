@@ -59,7 +59,11 @@ class _EstoqueScreenState extends State<EstoqueScreen> {
     if (!mounted || produto == null) return;
 
     try {
-      final salvo = await ApiService.criarProduto(produto);
+      final salvo = await ApiService.criarProduto(
+        produto,
+        imageBytes: produto['fotoBytes'] as List<int>?,
+        imageName: produto['fotoNome'] as String?,
+      );
       if (!mounted) return;
       setState(() => Produtos.lista.add(salvo));
       ScaffoldMessenger.of(context).showSnackBar(
@@ -87,7 +91,12 @@ class _EstoqueScreenState extends State<EstoqueScreen> {
 
     try {
       final id = (produtoAtual['id'] as num).toInt();
-      final salvo = await ApiService.atualizarProduto(id, produtoEditado);
+      final salvo = await ApiService.atualizarProduto(
+        id,
+        produtoEditado,
+        imageBytes: produtoEditado['fotoBytes'] as List<int>?,
+        imageName: produtoEditado['fotoNome'] as String?,
+      );
       if (!mounted) return;
       setState(() => Produtos.lista[index] = salvo);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -399,13 +408,7 @@ class _EstoqueScreenState extends State<EstoqueScreen> {
                         return Card(
                           margin: const EdgeInsets.only(bottom: 12),
                           child: ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: cor.withValues(alpha: 0.15),
-                              child: Icon(
-                                Icons.inventory_2_outlined,
-                                color: cor,
-                              ),
-                            ),
+                            leading: _imagemProduto(produto, cor),
                             title: Text(
                               produto['nome'] as String,
                               style: const TextStyle(
@@ -454,6 +457,32 @@ class _EstoqueScreenState extends State<EstoqueScreen> {
                     ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _imagemProduto(Map<String, dynamic> produto, Color cor) {
+    final imagemUrl = ApiService.urlImagem(
+      produto['imagemUrl']?.toString(),
+    );
+    if (imagemUrl == null) {
+      return CircleAvatar(
+        backgroundColor: cor.withValues(alpha: 0.15),
+        child: Icon(Icons.inventory_2_outlined, color: cor),
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Image.network(
+        imagemUrl,
+        width: 52,
+        height: 52,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => CircleAvatar(
+          backgroundColor: cor.withValues(alpha: 0.15),
+          child: Icon(Icons.broken_image_outlined, color: cor),
         ),
       ),
     );

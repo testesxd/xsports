@@ -16,8 +16,7 @@ namespace Xsports.Pages
             _environment = environment;
         }
 
-        [BindProperty]
-        public string NomeLoja { get; set; } = string.Empty;
+        public string NomeLoja { get; private set; } = string.Empty;
 
         [BindProperty]
         public string Desenvolvedores { get; set; } = string.Empty;
@@ -30,10 +29,7 @@ namespace Xsports.Pages
 
         public IActionResult OnPost()
         {
-            if (string.IsNullOrWhiteSpace(NomeLoja))
-            {
-                return Page();
-            }
+            NomeLoja = _configuration["ConfiguracoesLoja:NomeLoja"] ?? "Xsports";
 
             try
             {
@@ -51,7 +47,6 @@ namespace Xsports.Pages
                             jsonNode["ConfiguracoesLoja"] = new JsonObject();
                         }
 
-                        jsonNode["ConfiguracoesLoja"]!["NomeLoja"] = NomeLoja;
                         jsonNode["ConfiguracoesLoja"]!["Desenvolvedores"] = Desenvolvedores;
 
                         var options = new JsonSerializerOptions { WriteIndented = true };

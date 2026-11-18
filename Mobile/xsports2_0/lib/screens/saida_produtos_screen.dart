@@ -16,10 +16,36 @@ class _SaidaProdutosScreenState extends State<SaidaProdutosScreen> {
   int? produtoSelecionado;
   final quantidadeController = TextEditingController();
   bool registrando = false;
+  bool carregandoHistorico = false;
+  String? erroHistorico;
+  List<Map<String, dynamic>> historico = [];
 
   String motivo = 'Venda';
 
   final motivos = ['Venda', 'Troca', 'Uso interno', 'Perda ou avaria'];
+
+  @override
+  void initState() {
+    super.initState();
+    carregarHistorico();
+  }
+
+  Future<void> carregarHistorico() async {
+    setState(() {
+      carregandoHistorico = true;
+      erroHistorico = null;
+    });
+    try {
+      final movimentacoes = await ApiService.carregarMovimentacoes();
+      if (!mounted) return;
+      setState(() => historico = movimentacoes);
+    } on ApiException catch (error) {
+      if (!mounted) return;
+      setState(() => erroHistorico = error.message);
+    } finally {
+      if (mounted) setState(() => carregandoHistorico = false);
+    }
+  }
 
   int get quantidadeDisponivel {
     if (produtoSelecionado == null) return 0;
@@ -60,6 +86,8 @@ class _SaidaProdutosScreenState extends State<SaidaProdutosScreen> {
         produtoSelecionado = null;
         motivo = 'Venda';
       });
+      await carregarHistorico();
+      if (!mounted) return;
       mostrarMensagem('Saída registrada com sucesso!');
     } on ApiException catch (error) {
       if (!mounted) return;
@@ -239,9 +267,102 @@ class _SaidaProdutosScreenState extends State<SaidaProdutosScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 32),
+            Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'Histórico de saídas',
+                    style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'Atualizar histórico',
+                  onPressed: carregandoHistorico ? null : carregarHistorico,
+                  icon: const Icon(Icons.refresh),
+                ),
+              ],
+            ),
+            if (carregandoHistorico && historico.isEmpty)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(24),
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            else if (erroHistorico != null && historico.isEmpty)
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.error_outline, color: Colors.red),
+                  title: const Text('Não foi possível carregar o histórico.'),
+                  subtitle: Text(erroHistorico!),
+                  trailing: TextButton(
+                    onPressed: carregarHistorico,
+                    child: const Text('Tentar novamente'),
+                  ),
+                ),
+              )
+            else if (historico.isEmpty)
+              const Card(
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Text(
+                    'Nenhuma saída registrada até o momento.',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              )
+            else
+              ...historico.map(_cartaoHistorico),
           ],
         ),
       ),
     );
+  }
+
+  Widget _cartaoHistorico(Map<String, dynamic> item) {
+    final observacao = item['observacao']?.toString();
+    final data = DateTime.tryParse(item['dataMovimentacao'].toString());
+    final dataFormatada = data == null
+        ? item['dataMovimentacao'].toString()
+        : _formatarData(data.toLocal());
+    final detalhes = [
+      dataFormatada,
+      'Motivo: ${item['motivo']}',
+      if (observacao != null && observacao.isNotEmpty)
+        'Observação: $observacao',
+    ];
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: roxo.withValues(alpha: 0.12),
+          child: const Icon(Icons.remove_circle_outline, color: roxo),
+        ),
+        title: Text(
+          item['produtoNome']?.toString() ?? 'Produto Removido',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: Text(detalhes.join('\n')),
+        ),
+        isThreeLine: true,
+        trailing: Text(
+          '-${item['quantidade']} unid.',
+          style: const TextStyle(
+            color: Colors.red,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatarData(DateTime data) {
+    String doisDigitos(int valor) => valor.toString().padLeft(2, '0');
+    return '${doisDigitos(data.day)}/${doisDigitos(data.month)}/${data.year} '
+        '${doisDigitos(data.hour)}:${doisDigitos(data.minute)}';
   }
 }

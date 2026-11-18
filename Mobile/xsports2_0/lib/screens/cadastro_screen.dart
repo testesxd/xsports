@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+
+import '../api_service.dart';
 
 class CadastroScreen extends StatefulWidget {
   final Map<String, dynamic>? produto;
@@ -16,8 +20,11 @@ class _CadastroScreenState extends State<CadastroScreen> {
   final nomeController = TextEditingController();
   final precoController = TextEditingController();
   final quantidadeController = TextEditingController();
+  final imagePicker = ImagePicker();
 
   String categoria = 'Unissex';
+  Uint8List? fotoBytes;
+  String? fotoNome;
 
   static const roxo = Color(0xFF5145E5);
 
@@ -58,6 +65,55 @@ class _CadastroScreenState extends State<CadastroScreen> {
     super.dispose();
   }
 
+  Future<void> selecionarFoto() async {
+    final origem = await showDialog<ImageSource>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: const Text('Escolher foto'),
+        children: [
+          SimpleDialogOption(
+            onPressed: () => Navigator.pop(context, ImageSource.gallery),
+            child: const Text('Galeria'),
+          ),
+          SimpleDialogOption(
+            onPressed: () => Navigator.pop(context, ImageSource.camera),
+            child: const Text('Câmera'),
+          ),
+        ],
+      ),
+    );
+    if (origem == null) return;
+
+    try {
+      final arquivo = await imagePicker.pickImage(
+        source: origem,
+        imageQuality: 85,
+        maxWidth: 1600,
+      );
+      if (arquivo == null) return;
+
+      final bytes = await arquivo.readAsBytes();
+      if (bytes.length > 5 * 1024 * 1024) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('A foto deve ter no máximo 5 MB.')),
+        );
+        return;
+      }
+
+      if (!mounted) return;
+      setState(() {
+        fotoBytes = bytes;
+        fotoNome = arquivo.name;
+      });
+    } on PlatformException catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Não foi possível selecionar a foto: ${error.message ?? error.code}')),
+      );
+    }
+  }
+
   void salvarProduto() {
     final nome = nomeController.text.trim();
     final precoTexto =
@@ -71,10 +127,13 @@ class _CadastroScreenState extends State<CadastroScreen> {
         preco == null ||
         preco <= 0 ||
         quantidade == null ||
-        quantidade < 0) {
+        quantidade < 0 ||
+        (!editando && fotoBytes == null)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Preencha os campos com valores válidos.'),
+          content: Text(
+            'Preencha os campos com valores válidos e selecione uma foto.',
+          ),
         ),
       );
       return;
@@ -85,6 +144,8 @@ class _CadastroScreenState extends State<CadastroScreen> {
       'preco': preco,
       'categoria': categoria,
       'quantidade': quantidade,
+      'fotoBytes': fotoBytes,
+      'fotoNome': fotoNome,
     });
   }
 
@@ -203,6 +264,36 @@ class _CadastroScreenState extends State<CadastroScreen> {
             ),
           ),
 
+          const SizedBox(height: 20),
+
+          Text(
+            'Foto do produto${editando ? ' (opcional)' : ''}',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: cores.onSurface,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            height: 190,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: cores.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: cores.outlineVariant),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: fotoBytes != null
+                ? Image.memory(fotoBytes!, fit: BoxFit.contain)
+                : _imagemExistente(cores),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: selecionarFoto,
+            icon: const Icon(Icons.add_a_photo_outlined),
+            label: Text(fotoBytes == null ? 'Selecionar foto' : 'Trocar foto'),
+          ),
+
           const SizedBox(height: 28),
 
           SizedBox(
@@ -222,6 +313,32 @@ class _CadastroScreenState extends State<CadastroScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _imagemExistente(ColorScheme cores) {
+    final imagemUrl = ApiService.urlImagem(
+      widget.produto?['imagemUrl']?.toString(),
+    );
+    if (imagemUrl == null) {
+      return Center(
+        child: Icon(
+          Icons.image_outlined,
+          size: 56,
+          color: cores.onSurfaceVariant,
+        ),
+      );
+    }
+    return Image.network(
+      imagemUrl,
+      fit: BoxFit.contain,
+      errorBuilder: (context, error, stackTrace) => Center(
+        child: Icon(
+          Icons.broken_image_outlined,
+          size: 56,
+          color: cores.onSurfaceVariant,
+        ),
       ),
     );
   }

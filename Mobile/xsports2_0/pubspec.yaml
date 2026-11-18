@@ -14,6 +14,8 @@ dependencies:
   material_ui: ^1.1.0
   http: ^1.4.0
   cupertino_icons: ^1.0.8
+  image_picker: ^1.2.4
+  url_launcher: ^6.3.3
 
 dev_dependencies:
   flutter_test:

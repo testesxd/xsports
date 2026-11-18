@@ -17,8 +17,8 @@ class ApiService {
   ApiService._();
 
   static const _baseUrl = String.fromEnvironment(
-  'API_BASE_URL',
-  defaultValue: 'https://xsports.onrender.com',
+    'API_BASE_URL',
+    defaultValue: 'https://xsports.onrender.com',
   );
   static final http.Client _client = createApiClient();
   static String? _accessToken;
@@ -54,26 +54,53 @@ class ApiService {
         .toList();
   }
 
+  static Future<List<Map<String, dynamic>>> carregarMovimentacoes() async {
+    final response = await _send('GET', 'movimentacoes');
+    final movimentacoes = jsonDecode(response.body) as List<dynamic>;
+    return movimentacoes.map((item) => item as Map<String, dynamic>).toList();
+  }
+
+  static String? urlImagem(String? imagemUrl) {
+    if (imagemUrl == null || imagemUrl.isEmpty) return null;
+    final uri = Uri.tryParse(imagemUrl);
+    if (uri == null) return null;
+    return uri.hasScheme
+        ? uri.toString()
+        : Uri.parse(_baseUrl).resolveUri(uri).toString();
+  }
+
   static Future<Map<String, dynamic>> criarProduto(
-    Map<String, dynamic> produto,
-  ) async {
-    final response = await _send(
-      'POST',
-      'produtos',
-      body: _produtoApi(produto),
-    );
+    Map<String, dynamic> produto, {
+    List<int>? imageBytes,
+    String? imageName,
+  }) async {
+    final response = imageBytes == null
+        ? await _send('POST', 'produtos', body: _produtoApi(produto))
+        : await _sendMultipart(
+            'POST',
+            'produtos/upload',
+            fields: _produtoFields(produto),
+            imageBytes: imageBytes,
+            imageName: imageName ?? 'produto.jpg',
+          );
     return _produtoMobile(jsonDecode(response.body) as Map<String, dynamic>);
   }
 
   static Future<Map<String, dynamic>> atualizarProduto(
     int id,
-    Map<String, dynamic> produto,
-  ) async {
-    final response = await _send(
-      'PUT',
-      'produtos/$id',
-      body: _produtoApi(produto),
-    );
+    Map<String, dynamic> produto, {
+    List<int>? imageBytes,
+    String? imageName,
+  }) async {
+    final response = imageBytes == null
+        ? await _send('PUT', 'produtos/$id', body: _produtoApi(produto))
+        : await _sendMultipart(
+            'PUT',
+            'produtos/$id/upload',
+            fields: _produtoFields(produto),
+            imageBytes: imageBytes,
+            imageName: imageName ?? 'produto.jpg',
+          );
     return _produtoMobile(jsonDecode(response.body) as Map<String, dynamic>);
   }
 
@@ -105,6 +132,13 @@ class ApiService {
     'quantidade': produto['quantidade'],
     'categoria': produto['categoria'],
     'imagemUrl': produto['imagemUrl'],
+  };
+
+  static Map<String, String> _produtoFields(Map<String, dynamic> produto) => {
+    'nome': produto['nome'].toString(),
+    'preco': produto['preco'].toString(),
+    'quantidade': produto['quantidade'].toString(),
+    'categoria': produto['categoria'].toString(),
   };
 
   static Map<String, dynamic> _produtoMobile(Map<String, dynamic> produto) => {
@@ -139,6 +173,37 @@ class ApiService {
       if (body != null) {
         request.body = jsonEncode(body);
       }
+      response = await http.Response.fromStream(await _client.send(request));
+    } on http.ClientException catch (error) {
+      throw ApiException('Não foi possível conectar ao servidor: $error');
+    }
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw ApiException(_errorMessage(response));
+    }
+
+    return response;
+  }
+
+  static Future<http.Response> _sendMultipart(
+    String method,
+    String path, {
+    required Map<String, String> fields,
+    required List<int> imageBytes,
+    required String imageName,
+  }) async {
+    if (_accessToken == null) {
+      throw const ApiException('Faça login para continuar.');
+    }
+
+    late final http.Response response;
+    try {
+      final request = http.MultipartRequest(method, _uri(path))
+        ..headers['Authorization'] = 'Bearer $_accessToken'
+        ..fields.addAll(fields)
+        ..files.add(
+          http.MultipartFile.fromBytes('foto', imageBytes, filename: imageName),
+        );
       response = await http.Response.fromStream(await _client.send(request));
     } on http.ClientException catch (error) {
       throw ApiException('Não foi possível conectar ao servidor: $error');

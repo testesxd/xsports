@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import '../theme_controller.dart';
 import '../notificacoes_controller.dart';
 
@@ -12,10 +14,7 @@ class ConfiguracoesScreen extends StatelessWidget {
     final cores = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Configurações'),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Configurações'), elevation: 0),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -71,15 +70,24 @@ class ConfiguracoesScreen extends StatelessWidget {
                   },
                 ),
                 const Divider(height: 1),
-                const ListTile(
-                  leading: Icon(
-                    Icons.info_outline,
-                    color: roxoBotao,
-                  ),
+                ListTile(
+                  leading: Icon(Icons.info_outline, color: roxoBotao),
                   title: Text('Sobre o Xsports'),
-                  subtitle: Text(
-                    'Sistema de gerenciamento de estoque',
-                  ),
+                  subtitle: Text('Acesse xsports.onrender.com'),
+                  trailing: const Icon(Icons.open_in_new),
+                  onTap: () async {
+                    final uri = Uri.https('xsports.onrender.com');
+                    final abriu = await launchUrl(uri);
+                    if (!abriu && context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Não foi possível abrir o site Xsports.',
+                          ),
+                        ),
+                      );
+                    }
+                  },
                 ),
               ],
             ),
